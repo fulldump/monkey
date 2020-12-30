@@ -1,5 +1,10 @@
 package lexer
 
+import (
+	"strings"
+	"unicode"
+)
+
 type Lexer struct {
 	Input        string // TODO: change to reader
 	Position     int
@@ -17,30 +22,78 @@ func New(input string) *Lexer {
 
 func (l *Lexer) Token() *Token {
 
-	defer l.readChar()
+	l.skipWhitespaces()
+
+	t := &Token{
+		Literal: string(l.Ch), // Fill default token
+	}
 
 	switch l.Ch {
 	case '=':
-		return &Token{ASSIGN, string(l.Ch)}
+		t.Type = ASSIGN
+		l.readChar()
+		return t
 	case ';':
-		return &Token{SEMICOLON, string(l.Ch)}
+		t.Type = SEMICOLON
+		l.readChar()
+		return t
 	case '(':
-		return &Token{LPAREN, string(l.Ch)}
+		t.Type = LPAREN
+		l.readChar()
+		return t
 	case ')':
-		return &Token{RPAREN, string(l.Ch)}
+		t.Type = RPAREN
+		l.readChar()
+		return t
 	case ',':
-		return &Token{COMMA, string(l.Ch)}
+		t.Type = COMMA
+		l.readChar()
+		return t
 	case '+':
-		return &Token{PLUS, string(l.Ch)}
+		t.Type = PLUS
+		l.readChar()
+		return t
 	case '{':
-		return &Token{LBRACE, string(l.Ch)}
+		t.Type = LBRACE
+		l.readChar()
+		return t
 	case '}':
-		return &Token{RBRACE, string(l.Ch)}
+		t.Type = RBRACE
+		l.readChar()
+		return t
 	case 0:
 		return &Token{EOF, ""}
 	}
 
+	if unicode.IsLetter(int32(l.Ch)) {
+		literal := l.readIdentifier()
+		tokenType := IDENT
+		if strings.EqualFold("let", literal) {
+			tokenType = LET
+		} else if strings.EqualFold("fn", literal) {
+			tokenType = FUNCTION
+		}
+		return &Token{tokenType, literal}
+	}
+
+	if isDigit(l.Ch) {
+		literal := l.readNumber()
+		return &Token{INT, literal}
+	}
+
 	return &Token{ILLEGAL, string(l.Ch)}
+}
+
+func isDigit(ch byte) bool {
+	return '0' <= ch && ch <= '9'
+}
+
+func (l *Lexer) readIdentifier() string {
+	position := l.Position
+	for unicode.IsLetter(int32(l.Ch)) {
+		l.readChar()
+	}
+	return l.Input[position:l.Position]
 }
 
 func (l *Lexer) readChar() {
@@ -51,4 +104,18 @@ func (l *Lexer) readChar() {
 	}
 	l.Position = l.ReadPosition
 	l.ReadPosition++
+}
+
+func (l *Lexer) skipWhitespaces() {
+	for l.Ch == ' ' || l.Ch == '\t' || l.Ch == '\n' || l.Ch == '\r' {
+		l.readChar()
+	}
+}
+
+func (l *Lexer) readNumber() string {
+	position := l.Position
+	for isDigit(l.Ch) {
+		l.readChar()
+	}
+	return l.Input[position:l.Position]
 }
