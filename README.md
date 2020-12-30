@@ -16,3 +16,31 @@ similar to the Author's work, it has been written 100% from scratch without copy
 ## Disclaimer
 
 Consider this a mere software exercise, there is no warranty of any kind at all.
+
+
+## How to use
+
+You can compile REPL and get a binary inside `./bin/` folder with:
+
+```shell
+make repl
+```
+
+or
+
+```shell
+go build -o bin/repl ./cmd/repl/*
+```
+
+## How to test
+
+```shell
+make test
+```
+
+or
+
+```shell
+go test ./...
+```
+
