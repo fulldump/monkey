@@ -53,6 +53,30 @@ func (l *Lexer) Token() *Token {
 		t.Type = PLUS
 		l.readChar()
 		return t
+	case '-':
+		t.Type = MINUS
+		l.readChar()
+		return t
+	case '/':
+		t.Type = SLASH
+		l.readChar()
+		return t
+	case '*':
+		t.Type = ASTERISK
+		l.readChar()
+		return t
+	case '!':
+		t.Type = BANG
+		l.readChar()
+		return t
+	case '<':
+		t.Type = LT
+		l.readChar()
+		return t
+	case '>':
+		t.Type = GT
+		l.readChar()
+		return t
 	case '{':
 		t.Type = LBRACE
 		l.readChar()
@@ -68,11 +92,12 @@ func (l *Lexer) Token() *Token {
 	if unicode.IsLetter(int32(l.Ch)) {
 		literal := l.readIdentifier()
 		tokenType := IDENT
-		if strings.EqualFold("let", literal) {
-			tokenType = LET
-		} else if strings.EqualFold("fn", literal) {
-			tokenType = FUNCTION
+
+		k := strings.ToLower(literal)
+		if tt, isKeyword := keywords[k]; isKeyword {
+			tokenType = tt
 		}
+
 		return &Token{tokenType, literal}
 	}
 

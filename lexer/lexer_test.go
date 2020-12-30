@@ -14,6 +14,15 @@ let add = fn(x,y) {
 };
 
 let result = add(five, ten);
+
+!-/*5;
+5 < 10 > 5;
+
+if (5 < 10) {
+  return true;
+} else {
+  return false;
+}
 `
 
 	cases := []struct {
@@ -68,6 +77,49 @@ let result = add(five, ten);
 		{RPAREN, ")"},
 		{SEMICOLON, ";"},
 
+		// !-/*5;
+		{BANG, "!"},
+		{MINUS, "-"},
+		{SLASH, "/"},
+		{ASTERISK, "*"},
+		{INT, "5"},
+		{SEMICOLON, ";"},
+
+		// 5 < 10 > 5;
+		{INT, "5"},
+		{LT, "<"},
+		{INT, "10"},
+		{GT, ">"},
+		{INT, "5"},
+		{SEMICOLON, ";"},
+
+		// if (5 < 10) {
+		{IF, "if"},
+		{LPAREN, "("},
+		{INT, "5"},
+		{LT, "<"},
+		{INT, "10"},
+		{RPAREN, ")"},
+		{LBRACE, "{"},
+
+		// return true;
+		{RETURN, "return"},
+		{TRUE, "true"},
+		{SEMICOLON, ";"},
+
+		// } else {
+		{RBRACE, "}"},
+		{ELSE, "else"},
+		{LBRACE, "{"},
+
+		// return false;
+		{RETURN, "return"},
+		{FALSE, "false"},
+		{SEMICOLON, ";"},
+
+		// }
+		{RBRACE, "}"},
+
 		// EOF
 		{EOF, ""},
 		{EOF, ""}, // Repeat
@@ -84,7 +136,7 @@ let result = add(five, ten);
 		}
 
 		if k.Literal != c.expectedLiteral {
-			t.Fatalf("token %d: literal wrong", i)
+			t.Fatalf("token %d: literal wrong, expected %q, got %q", i, c.expectedLiteral, k.Literal)
 		}
 
 	}
