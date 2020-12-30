@@ -30,6 +30,13 @@ func (l *Lexer) Token() *Token {
 
 	switch l.Ch {
 	case '=':
+		if l.peekChar() == '=' {
+			t.Type = EQ
+			t.Literal = "=="
+			l.readChar()
+			l.readChar()
+			return t
+		}
 		t.Type = ASSIGN
 		l.readChar()
 		return t
@@ -66,6 +73,13 @@ func (l *Lexer) Token() *Token {
 		l.readChar()
 		return t
 	case '!':
+		if l.peekChar() == '=' {
+			t.Type = NEQ
+			t.Literal = "!="
+			l.readChar()
+			l.readChar()
+			return t
+		}
 		t.Type = BANG
 		l.readChar()
 		return t
@@ -143,4 +157,11 @@ func (l *Lexer) readNumber() string {
 		l.readChar()
 	}
 	return l.Input[position:l.Position]
+}
+
+func (l *Lexer) peekChar() byte {
+	if l.ReadPosition >= len(l.Input) {
+		return 0
+	}
+	return l.Input[l.ReadPosition]
 }
