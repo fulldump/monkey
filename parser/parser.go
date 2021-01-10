@@ -46,6 +46,8 @@ func (p *Parser) parseStatement() interface{} {
 	switch p.curToken.Type {
 	case lexer.LET:
 		return p.parseLetStatement()
+	case lexer.RETURN:
+		return p.parseReturnStatement()
 	default:
 		return nil
 	}
@@ -61,7 +63,7 @@ func (p *Parser) parseLetStatement() *ast.Let {
 	if lexer.LET != p.curToken.Type {
 		return nil // TODO: expected LET
 	}
-	p.nextToken()
+	p.nextToken() // consume 'let'
 
 	s := &ast.Let{}
 
@@ -77,6 +79,34 @@ func (p *Parser) parseLetStatement() *ast.Let {
 		Token: p.curToken,
 		Value: p.curToken.Literal, // Redundant?
 	}
+
+	// TODO: implement expression
+
+	// Find semicolon
+	for p.curToken.Type != lexer.SEMICOLON {
+		p.nextToken()
+		if p.curToken.Type == lexer.EOF {
+			return nil // TODO: unexpected eof
+		}
+	}
+
+	p.nextToken() // consume semicolon
+
+	return s
+}
+
+func (p *Parser) parseReturnStatement() *ast.Return {
+
+	if lexer.RETURN != p.curToken.Type {
+		return nil // TODO: expected RETURN
+	}
+
+	s := &ast.Return{
+		Token: p.curToken,
+		Value: "",
+	}
+
+	p.nextToken() // consume 'return'
 
 	// TODO: implement expression
 
